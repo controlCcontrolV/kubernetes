@@ -110,6 +110,7 @@ func init() {
 
 func defaultPredicates() sets.String {
 	return sets.NewString(
+		/*
 		// Fit is determined by volume zone requirements.
 		factory.RegisterFitPredicateFactory(
 			"NoVolumeZoneConflict",
@@ -142,16 +143,17 @@ func defaultPredicates() sets.String {
 				return predicates.NewPodAffinityPredicate(args.NodeInfo, args.PodLister, args.FailureDomains)
 			},
 		),
+		*/
 
 		// Fit is determined by non-conflicting disk volumes.
-		factory.RegisterFitPredicate("NoDiskConflict", predicates.NoDiskConflict),
+		// factory.RegisterFitPredicate("NoDiskConflict", predicates.NoDiskConflict),
 
 		// GeneralPredicates are the predicates that are enforced by all Kubernetes components
 		// (e.g. kubelet and all schedulers)
 		factory.RegisterFitPredicate("GeneralPredicates", predicates.GeneralPredicates),
 
 		// Fit is determined based on whether a pod can tolerate all of the node's taints
-		factory.RegisterFitPredicate("PodToleratesNodeTaints", predicates.PodToleratesNodeTaints),
+		// factory.RegisterFitPredicate("PodToleratesNodeTaints", predicates.PodToleratesNodeTaints),
 
 		// Fit is determined by node memory pressure condition.
 		factory.RegisterFitPredicate("CheckNodeMemoryPressure", predicates.CheckNodeMemoryPressurePredicate),
@@ -163,6 +165,7 @@ func defaultPredicates() sets.String {
 
 func defaultPriorities() sets.String {
 	return sets.NewString(
+		/*
 		// spreads pods by minimizing the number of pods (belonging to the same service or replication controller) on the same node.
 		factory.RegisterPriorityConfigFactory(
 			"SelectorSpreadPriority",
@@ -184,6 +187,7 @@ func defaultPriorities() sets.String {
 				Weight: 1,
 			},
 		),
+		*/
 
 		// Prioritize nodes by least requested utilization.
 		factory.RegisterPriorityFunction2("LeastRequestedPriority", priorities.LeastRequestedPriorityMap, nil, 1),
@@ -191,6 +195,7 @@ func defaultPriorities() sets.String {
 		// Prioritizes nodes to help achieve balanced resource usage
 		factory.RegisterPriorityFunction2("BalancedResourceAllocation", priorities.BalancedResourceAllocationMap, nil, 1),
 
+		/*
 		// Set this weight large enough to override all other priority functions.
 		// TODO: Figure out a better way to do this, maybe at same time as fixing #24720.
 		factory.RegisterPriorityFunction2("NodePreferAvoidPodsPriority", priorities.CalculateNodePreferAvoidPodsPriorityMap, nil, 10000),
@@ -200,6 +205,7 @@ func defaultPriorities() sets.String {
 
 		// TODO: explain what it does.
 		factory.RegisterPriorityFunction2("TaintTolerationPriority", priorities.ComputeTaintTolerationPriorityMap, priorities.ComputeTaintTolerationPriorityReduce, 1),
+		*/
 	)
 }
 
