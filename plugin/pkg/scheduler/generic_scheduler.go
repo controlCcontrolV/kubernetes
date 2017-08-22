@@ -145,14 +145,23 @@ func (g *genericScheduler) selectHost(priorityList schedulerapi.HostPriorityList
 		return "", fmt.Errorf("empty priorityList")
 	}
 
+	//priorityList是一个key(hostName)-value(score)键值对，倒序排序，priorityList已经是倒序
 	sort.Sort(sort.Reverse(priorityList))
+
+	//节点的最大值
 	maxScore := priorityList[0].Score
+
+	//为什么要使用这种方式，因为key-value形式的字典根据value值排序了，需要找到对应的key
+	//找出最大值后面的第一个值，返回
 	firstAfterMaxScore := sort.Search(len(priorityList), func(i int) bool { return priorityList[i].Score < maxScore })
 
+	// 为何加锁？g.lastNodeIndex初始值为0
 	g.lastNodeIndexLock.Lock()
 	ix := int(g.lastNodeIndex % uint64(firstAfterMaxScore))
 	g.lastNodeIndex++
 	g.lastNodeIndexLock.Unlock()
+
+	glog.V(4).Infof("选择得分最优节点，ix = %v, priorityList[ix].Host = %v", ix, priorityList[ix].Host)
 
 	return priorityList[ix].Host, nil
 }
@@ -377,6 +386,9 @@ func PrioritizeNodes(
 			glog.V(10).Infof("Host %s => Score %d", result[i].Host, result[i].Score)
 		}
 	}
+
+	glog.V(4).Infof("最终各节点得分，result = %v", result)
+
 	return result, nil
 }
 
