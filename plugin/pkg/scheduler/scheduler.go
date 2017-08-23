@@ -87,6 +87,7 @@ func (s *Scheduler) Run() {
 	go wait.Until(s.scheduleOne, 0, s.config.StopEverything)
 }
 
+// 调度pod核心代码
 func (s *Scheduler) scheduleOne() {
 	pod := s.config.NextPod()
 

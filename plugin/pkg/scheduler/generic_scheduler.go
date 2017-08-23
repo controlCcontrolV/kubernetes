@@ -259,6 +259,8 @@ func podFitsOnNode(pod *api.Pod, meta interface{}, info *schedulercache.NodeInfo
 // Each priority function can also have its own weight
 // The node scores returned by the priority function are multiplied by the weights to get weighted scores
 // All scores are finally combined (added) to get the total weighted scores of all nodes
+
+// 并行执行多个优选策略
 func PrioritizeNodes(
 	pod *api.Pod,
 	nodeNameToInfo map[string]*schedulercache.NodeInfo,
@@ -351,10 +353,14 @@ func PrioritizeNodes(
 	for i := range nodes {
 		result = append(result, schedulerapi.HostPriority{Host: nodes[i].Name, Score: 0})
 		for j := range priorityConfigs {
+			// 各个priorities的加权求和过程
 			result[i].Score += results[j][i].Score * priorityConfigs[j].Weight
+			glog.V(4).Infof("对于节点：%v，优选策略为%v，策略的权重为%v, 得分为%v", result[i].Host, priorityConfigs[j].Function,
+				priorityConfigs[j].Weight, results[j][i].Score)
 		}
 	}
 
+	// extender=0，不考虑外部调度
 	if len(extenders) != 0 && nodes != nil {
 		combinedScores := make(map[string]int, len(nodeNameToInfo))
 		for _, extender := range extenders {
